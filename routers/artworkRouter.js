@@ -36,4 +36,21 @@ router.get("/:id", async (req, res) => {
   res.status(200).send({ message: "ok", artwork });
 });
 
+// PATCH - update space details
+
+router.patch("/:id", async (req, res) => {
+  const artwork = await Artwork.findByPk(req.params.id, { include: [Bid] });
+  // if (!artwork.userId === req.user.id) {
+  //   return res
+  //     .status(403)
+  //     .send({ message: "You are not authorized to update this space" });
+  // }
+
+  const hearts = artwork.hearts + 1;
+
+  await artwork.update({ hearts });
+  console.log("artwork", artwork);
+  return res.status(200).send({ artwork });
+});
+
 module.exports = router;
