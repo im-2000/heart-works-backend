@@ -36,21 +36,40 @@ router.get("/:id", async (req, res) => {
   res.status(200).send({ message: "ok", artwork });
 });
 
-// PATCH - update space details
+// PATCH - update details
 
 router.patch("/:id", async (req, res) => {
   const artwork = await Artwork.findByPk(req.params.id, { include: [Bid] });
-  // if (!artwork.userId === req.user.id) {
-  //   return res
-  //     .status(403)
-  //     .send({ message: "You are not authorized to update this space" });
-  // }
 
   const hearts = artwork.hearts + 1;
 
   await artwork.update({ hearts });
-  console.log("artwork", artwork);
+
   return res.status(200).send({ artwork });
+});
+
+// POST a new artwork
+
+router.post("/", async (req, res, next) => {
+  try {
+    const { title, minimumBid, imageUrl } = req.body;
+    const artwork = await Artwork.findByPk(userId);
+    if (!title || !minimumBid || !imageUrl) {
+      res.status(400).send("missing parameters");
+    }
+    if (user) {
+      const newArtwork = await Artwork.create({
+        title,
+        minimumBid,
+        imageUrl,
+      });
+      res.send(newArtwork);
+    } else {
+      console.log(`User with this id: ${userId} doesn't exist`);
+    }
+  } catch (e) {
+    next(e);
+  }
 });
 
 module.exports = router;
