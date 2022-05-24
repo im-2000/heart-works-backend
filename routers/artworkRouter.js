@@ -90,7 +90,7 @@ router.post("/", auth, async (req, res, next) => {
         imageUrl,
         userId: user.id,
       });
-      res.send(newArtwork);
+      res.send({ message: "Artwork created", newArtworkId: newArtwork.id });
     } else {
       console.log(`User with this id: ${userId} doesn't exist`);
     }
