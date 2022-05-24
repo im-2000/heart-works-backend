@@ -75,9 +75,10 @@ router.post("/:id/bids", auth, async (req, res) => {
   return res.status(201).send({ message: "Bid created", bid });
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     const { title, minimumBid, imageUrl, userId } = req.body;
+    const user = req.user;
 
     if (!title || !minimumBid || !imageUrl) {
       res.status(400).send("missing parameters");
@@ -87,7 +88,7 @@ router.post("/", async (req, res, next) => {
         title,
         minimumBid,
         imageUrl,
-        userId,
+        userId: user.id,
       });
       res.send(newArtwork);
     } else {
