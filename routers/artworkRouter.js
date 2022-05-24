@@ -21,7 +21,7 @@ router.get("/:id", async (req, res) => {
 
   console.log(id);
   if (isNaN(parseInt(id))) {
-    return res.status(400).send({ message: "Space id is not a number" });
+    return res.status(400).send({ message: "Artwork id is not a number" });
   }
 
   const artwork = await Artwork.findByPk(id, {
