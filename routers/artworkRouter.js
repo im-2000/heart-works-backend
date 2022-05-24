@@ -47,7 +47,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 router.post("/:id/bids", auth, async (req, res) => {
-  const artwork = await Artwork.findByPk(req.params.id);
+  const artwork = await Artwork.findByPk(req.params.id, { include: Bid });
   const user = req.user;
 
   if (artwork === null) {
@@ -64,6 +64,11 @@ router.post("/:id/bids", auth, async (req, res) => {
 
   if (!amount) {
     return res.status(400).send({ message: "A bit must have a amount" });
+  }
+
+  const maxBid = Math.max(...artwork.bids.map((b) => b.amount));
+  if (amount <= maxBid) {
+    return res.status(400).send({ message: "Current bid must be higher" });
   }
 
   const bid = await Bid.create({
