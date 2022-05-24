@@ -1,11 +1,11 @@
 const { Router } = require("express");
+const { user } = require("pg/lib/defaults");
 const auth = require("../auth/middleware");
 const Artwork = require("../models").artwork;
 const Bid = require("../models").bid;
+const User = require("../models").user;
 
 const router = new Router();
-
-// GET ALL ARTWORKS
 
 router.get("/", async (req, res, next) => {
   try {
@@ -36,8 +36,6 @@ router.get("/:id", async (req, res) => {
   res.status(200).send({ message: "ok", artwork });
 });
 
-// PATCH - update details
-
 router.patch("/:id", async (req, res) => {
   const artwork = await Artwork.findByPk(req.params.id, { include: [Bid] });
 
@@ -48,12 +46,39 @@ router.patch("/:id", async (req, res) => {
   return res.status(200).send({ artwork });
 });
 
-// POST a new artwork
+router.post("/:id/bids", auth, async (req, res) => {
+  const artwork = await Artwork.findByPk(req.params.id);
+  const user = req.user;
+
+  if (artwork === null) {
+    return res.status(404).send({ message: "This artwork does not exist" });
+  }
+
+  if (!artwork.userId === req.userId) {
+    return res
+      .status(403)
+      .send({ message: "You are not authorized to update this artwork" });
+  }
+
+  const { amount } = req.body;
+
+  if (!amount) {
+    return res.status(400).send({ message: "A bit must have a amount" });
+  }
+
+  const bid = await Bid.create({
+    amount,
+    email: user.email,
+    artworkId: artwork.id,
+  });
+
+  return res.status(201).send({ message: "Bid created", bid });
+});
 
 router.post("/", async (req, res, next) => {
   try {
-    const { title, minimumBid, imageUrl } = req.body;
-    const artwork = await Artwork.findByPk(userId);
+    const { title, minimumBid, imageUrl, userId } = req.body;
+
     if (!title || !minimumBid || !imageUrl) {
       res.status(400).send("missing parameters");
     }
@@ -62,6 +87,7 @@ router.post("/", async (req, res, next) => {
         title,
         minimumBid,
         imageUrl,
+        userId,
       });
       res.send(newArtwork);
     } else {
