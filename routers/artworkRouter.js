@@ -7,6 +7,8 @@ const User = require("../models").user;
 
 const router = new Router();
 
+// GET ALL ARTWORKS
+
 router.get("/", async (req, res, next) => {
   try {
     res.send(await Artwork.findAll());
@@ -15,6 +17,8 @@ router.get("/", async (req, res, next) => {
     next(e);
   }
 });
+
+// GET ARTWORK BY ID
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -36,6 +40,8 @@ router.get("/:id", async (req, res) => {
   res.status(200).send({ message: "ok", artwork });
 });
 
+// UPDATE ARTWORK HEARTS
+
 router.patch("/:id", async (req, res) => {
   const artwork = await Artwork.findByPk(req.params.id, { include: [Bid] });
 
@@ -45,6 +51,8 @@ router.patch("/:id", async (req, res) => {
 
   return res.status(200).send({ artwork });
 });
+
+// POST NEW BID
 
 router.post("/:id/bids", auth, async (req, res) => {
   const artwork = await Artwork.findByPk(req.params.id, { include: Bid });
@@ -79,6 +87,8 @@ router.post("/:id/bids", auth, async (req, res) => {
 
   return res.status(201).send({ message: "Bid created", bid });
 });
+
+// POST ARTWORK
 
 router.post("/", auth, async (req, res, next) => {
   try {
