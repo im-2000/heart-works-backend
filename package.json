@@ -30,7 +30,7 @@
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "nodemon": "^2.0.16"
   }
 }
